@@ -35,4 +35,4 @@ cd build/game/Release
 
 These are ready for model and texture import in the next step.
 
-CMake uses 3rdParty dependencies from the excersise folder, put info-h502 in the root folder before building. and make sure glad, glfw, glm, and stb are not empty otherwise you can clone them as stated in the exercises gitlab.
+* CMake uses 3rdParty dependencies from the exercise folder; put info-h502 in the root folder before building. And make sure glad, glfw, glm, and stb are not empty, otherwise you can clone them as stated in the exercises on GitLab.

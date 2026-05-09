@@ -1,4 +1,4 @@
-# Shrine Scene Scaffold
+# Shrine Scene Setup
 
 ## Current scope
 

@@ -220,7 +220,7 @@ void Scene::render(const glm::mat4& view, const glm::mat4& projection, const glm
         temple->draw();
     }
 
-    // Animated ghost replacing the moving cube placeholder.
+    // Animated ghost.
     // Drawn after opaque objects with alpha blending.
     if (ghost) {
         const glm::vec3 ghostPos = glm::vec3(

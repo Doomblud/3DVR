@@ -57,3 +57,16 @@ Thumbs.db
 
 # course-folder that conrains build dependencis
 info-h502_202526-main/
+
+# asssets
+*.png
+*.jpg
+*.jpeg
+*.bmp
+*.tga
+*.fbx
+*.obj
+*.mtl
+*.blend
+*.mp4
+*.avi

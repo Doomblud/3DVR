@@ -58,6 +58,8 @@ bool Application::initialize() {
 
     glViewport(0, 0, width, height);
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     instance = this;
     glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
@@ -80,7 +82,7 @@ void Application::run() {
         processInput(deltaTime);
         scene.update(deltaTime);
 
-        glClearColor(0.06f, 0.08f, 0.10f, 1.0f);
+        glClearColor(0.02f, 0.04f, 0.08f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         const glm::mat4 view = camera.getViewMatrix();

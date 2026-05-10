@@ -1,4 +1,5 @@
 #include "scene.h"
+#include "texture.h"
 
 #include <glad/glad.h>
 
@@ -53,7 +54,11 @@ float cubeVertices[] = {
 }
 
 Scene::Scene()
-    : cubeVao(0), cubeVbo(0), moverPhase(0.0f) {
+    : cubeVao(0), cubeVbo(0), moverPhase(0.0f), templeTexture(0), ghostTexture(0) {
+    moon.direction = glm::normalize(glm::vec3(-0.35f, -1.0f, -0.15f));
+    moon.color = glm::vec3(0.72f, 0.80f, 1.0f);
+    moon.intensity = 0.85f;
+
     lantern.position = glm::vec3(0.0f, 2.2f, 0.0f);
     lantern.color = glm::vec3(1.0f, 0.8f, 0.45f);
     lantern.intensity = 1.6f;
@@ -92,6 +97,24 @@ void Scene::initialize() {
     glEnableVertexAttribArray(1);
 
     glBindVertexArray(0);
+
+    // Load temple model
+    temple = std::make_unique<Object>(GAME_ASSET_DIR "/models/Japanese_Temple.obj");
+    temple->makeObject(shader, true);
+    temple->model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -4.0f));
+    temple->model = glm::scale(temple->model, glm::vec3(0.25f, 0.25f, 0.25f));  // Much larger
+    
+    // Load temple albedo texture
+    templeTexture = TextureLoader::loadTexture(GAME_ASSET_DIR "/textures/Japanese_Temple_Paint2_Japanese_Shrine_Mat_AlbedoTransparency.png");
+    temple->setTexture(templeTexture);
+
+    // Load ghost model (uses material colors from shader fallback color for now).
+    ghost = std::make_unique<Object>(GAME_ASSET_DIR "/models/Ghost.obj");
+    ghost->makeObject(shader, true);
+    ghostTexture = TextureLoader::createWhiteTexture();
+    ghost->setTexture(ghostTexture);
+    
+    std::cout << "Temple model initialized with texture" << std::endl;
 
     buildStaticLayout();
 }
@@ -155,13 +178,21 @@ void Scene::render(const glm::mat4& view, const glm::mat4& projection, const glm
     shader.setVec3("uLight.position", lantern.position);
     shader.setVec3("uLight.color", lantern.color);
     shader.setFloat("uLight.intensity", lantern.enabled ? lantern.intensity : 0.0f);
+    shader.setVec3("uMoon.direction", moon.direction);
+    shader.setVec3("uMoon.color", moon.color);
+    shader.setFloat("uMoon.intensity", moon.intensity);
+    shader.setFloat("uLanternRange", 6.0f);
+    shader.setInt("uUnlit", 0);
+    shader.setFloat("uOpacity", 1.0f);
+    shader.setInt("uTexture", 0);
 
     // Ground
-    drawCube(staticObjects[0], glm::vec3(0.22f, 0.30f, 0.20f));
+    glBindTexture(GL_TEXTURE_2D, 0);
+    drawCube(staticObjects[0], glm::vec3(0.5f, 0.5f, 0.5f));
 
     // Shrine and walls
     for (size_t i = 1; i < staticObjects.size(); ++i) {
-        drawCube(staticObjects[i], glm::vec3(0.52f, 0.45f, 0.36f));
+        drawCube(staticObjects[i], glm::vec3(0.7f, 0.65f, 0.5f));
     }
 
     // Lantern cube
@@ -170,11 +201,48 @@ void Scene::render(const glm::mat4& view, const glm::mat4& projection, const glm
     lanternModel = glm::scale(lanternModel, glm::vec3(0.35f, 0.35f, 0.35f));
     drawCube(lanternModel, lantern.enabled ? glm::vec3(1.0f, 0.75f, 0.30f) : glm::vec3(0.28f, 0.24f, 0.20f));
 
-    // Simple moving object placeholder
-    glm::mat4 mover(1.0f);
-    mover = glm::translate(mover, glm::vec3(2.8f * sin(moverPhase), 0.35f, 2.2f * cos(moverPhase * 0.7f)));
-    mover = glm::scale(mover, glm::vec3(0.45f, 0.45f, 0.45f));
-    drawCube(mover, glm::vec3(0.25f, 0.55f, 0.78f));
+    // Visible moon marker in the sky (unlit emissive object).
+    glm::mat4 moonModel(1.0f);
+    moonModel = glm::translate(moonModel, glm::vec3(14.0f, 18.0f, -26.0f));
+    moonModel = glm::scale(moonModel, glm::vec3(1.6f, 1.6f, 1.6f));
+    shader.setInt("uUnlit", 1);
+    shader.setFloat("uOpacity", 1.0f);
+    drawCube(moonModel, glm::vec3(0.92f, 0.96f, 1.0f));
+    shader.setInt("uUnlit", 0);
+
+    // Render temple model (test if it shows)
+    if (temple) {
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, templeTexture);
+        shader.setMat4("uModel", temple->model);
+        shader.setVec3("uObjectColor", glm::vec3(1.0f, 1.0f, 1.0f));  // White so texture shows
+        shader.setFloat("uOpacity", 1.0f);
+        temple->draw();
+    }
+
+    // Animated ghost replacing the moving cube placeholder.
+    // Drawn after opaque objects with alpha blending.
+    if (ghost) {
+        const glm::vec3 ghostPos = glm::vec3(
+            2.8f * sin(moverPhase),
+            0.55f + 0.18f * sin(moverPhase * 2.2f),
+            2.2f * cos(moverPhase * 0.7f));
+
+        ghost->model = glm::mat4(1.0f);
+        ghost->model = glm::translate(ghost->model, ghostPos);
+        ghost->model = glm::rotate(ghost->model, -moverPhase * 0.7f, glm::vec3(0.0f, 1.0f, 0.0f));
+        ghost->model = glm::scale(ghost->model, glm::vec3(0.35f, 0.35f, 0.35f));
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, ghostTexture);
+        shader.setMat4("uModel", ghost->model);
+        shader.setVec3("uObjectColor", glm::vec3(0.86f, 0.92f, 1.0f));
+        shader.setFloat("uOpacity", 0.48f);
+        glDepthMask(GL_FALSE);
+        ghost->draw();
+        glDepthMask(GL_TRUE);
+        shader.setFloat("uOpacity", 1.0f);
+    }
 }
 
 void Scene::toggleLantern() {

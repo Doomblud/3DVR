@@ -34,8 +34,16 @@ public:
 
 private:
     Shader shader;
+    Shader skyboxShader;
+    Shader waterShader;
     unsigned int cubeVao;
     unsigned int cubeVbo;
+    unsigned int skyboxVao;
+    unsigned int skyboxVbo;
+    unsigned int waterVao;
+    unsigned int waterVbo;
+    GLuint cubemapTexture;
+    GLuint whiteTexture;
 
     PointLight lantern;
     DirectionalLight moon;
@@ -48,8 +56,14 @@ private:
     GLuint templeTexture;
     std::unique_ptr<Object> ghost;
     GLuint ghostTexture;
+    std::unique_ptr<Object> lanternObject;
+    GLuint lanternTexture;
 
     void buildStaticLayout();
+    void buildSkybox();
+    void buildPond();
+    void drawSkybox(const glm::mat4& view, const glm::mat4& projection) const;
+    void drawPond(const glm::mat4& view, const glm::mat4& projection, const glm::vec3& cameraPos) const;
     void drawCube(const glm::mat4& model, const glm::vec3& color) const;
 };
 

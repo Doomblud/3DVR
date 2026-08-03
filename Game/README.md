@@ -6,6 +6,8 @@
 - Free camera navigation.
 - Scene renderer with placeholder shrine yard layout.
 - Basic ambient + diffuse + specular lighting.
+- Procedural cubemap skybox.
+- Reflective/refractive pond water.
 - Lantern toggle interaction placeholder.
 
 ## Controls

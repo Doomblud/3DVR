@@ -11,7 +11,7 @@
         - Loading textures onto model 
     - Loading (more than one) model ✔
         - standard
-    - Cubemap  
+    - Cubemap ✔
         - standard
     - Game logic 
         - Clicking lantern turns it on/off ✔
@@ -19,8 +19,8 @@
         - Person walking around
     - free navigation within it (camera control) ✔
         - standard
-    - Reflection/refraction 
-        - Pond in the scene reflecting
+    - Reflection/refraction ✔
+        - Pond in the scene reflecting/refracting the cubemap
 
 - Intermediate features:
     - frame buffer object effects

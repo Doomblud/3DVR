@@ -59,14 +59,14 @@ Thumbs.db
 info-h502_202526-main/
 
 # asssets
-*.png
-*.jpg
-*.jpeg
+# *.png
+# *.jpg
+# *.jpeg
 *.bmp
 *.tga
 *.fbx
-*.obj
-*.mtl
+# # *.obj
+# *.mtl
 *.blend
 *.mp4
 *.avi

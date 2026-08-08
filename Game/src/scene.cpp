@@ -12,7 +12,7 @@
 namespace {
 const glm::vec3 moonMarkerPosition(6.0f, 10.0f, -28.0f);
 const glm::vec3 lanternBasePosition(3.7f, -0.38f, -2.35f);
-constexpr float lanternModelScale = 0.12f;
+const glm::vec3 lanternModelScale(0.12f, 0.30f, 0.12f);
 
 float cubeVertices[] = {
     -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
@@ -203,7 +203,7 @@ Scene::Scene()
     moon.color = glm::vec3(0.72f, 0.80f, 1.0f);
     moon.intensity = 0.85f;
 
-    lantern.position = lanternBasePosition + glm::vec3(0.0f, 1.08f, 0.0f);
+    lantern.position = lanternBasePosition + glm::vec3(0.0f, 2.15f, 0.0f);
     lantern.color = glm::vec3(1.0f, 0.8f, 0.45f);
     lantern.intensity = 1.6f;
     lantern.enabled = true;
@@ -448,7 +448,7 @@ void Scene::render(const glm::mat4& view, const glm::mat4& projection, const glm
         lanternObject->model = glm::mat4(1.0f);
         lanternObject->model = glm::translate(lanternObject->model, lanternBasePosition);
         lanternObject->model = glm::rotate(lanternObject->model, glm::radians(20.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-        lanternObject->model = glm::scale(lanternObject->model, glm::vec3(lanternModelScale));
+        lanternObject->model = glm::scale(lanternObject->model, lanternModelScale);
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, lanternTexture);

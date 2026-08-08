@@ -65,8 +65,8 @@ info-h502_202526-main/
 *.bmp
 *.tga
 *.fbx
-# # *.obj
+# *.obj
 # *.mtl
-*.blend
+# *.blend
 *.mp4
 *.avi

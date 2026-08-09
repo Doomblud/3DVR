@@ -68,7 +68,7 @@ void main()
 
     float lanternDiff = toonStep(max(dot(normal, lanternLightDir), 0.0));
     float lanternDistance = length(uLight.position - vFragPos);
-    float lanternFalloff = 1.0 - smoothstep(uLanternRange * 0.4, uLanternRange, lanternDistance);
+    float lanternFalloff = 1.0 - toonStep(smoothstep(uLanternRange * 0.4, uLanternRange, lanternDistance)); // @ali keep smooth or not?
     vec3 lanternDiffuse = lanternDiff * objectColor * uLight.color * uLight.intensity * lanternFalloff;
 
     float specStrength = 0.2;

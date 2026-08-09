@@ -4,6 +4,8 @@
 #include "camera.h"
 #include "scene.h"
 
+#include "shader.h"
+
 #include <GLFW/glfw3.h>
 
 #include <string>
@@ -38,9 +40,15 @@ private:
 
     static Application* instance;
 
+    Shader edgeShader;
+
+    GLuint screenVAO;
+    GLuint screenVBO;
+
     void processInput(float dt);
 
     void initializeFramebuffer();
+    void initializeScreenQuad();
     static void framebufferSizeCallback(GLFWwindow* window, int width, int height);
     static void mouseCallback(GLFWwindow* window, double xPos, double yPos);
     static void scrollCallback(GLFWwindow* window, double xOffset, double yOffset);

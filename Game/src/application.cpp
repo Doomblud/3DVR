@@ -18,7 +18,9 @@ Application::Application(int width, int height, const std::string& title)
       lastFrameTime(0.0f),
       lastMouseX(static_cast<float>(width) * 0.5f),
       lastMouseY(static_cast<float>(height) * 0.5f),
-      firstMouseSample(true) {
+      firstMouseSample(true),
+      screenVAO(0),
+      screenVBO(0){
 }
 
 Application::~Application() {
@@ -132,6 +134,55 @@ void Application::initializeFramebuffer()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+void Application::initializeScreenQuad()
+{
+    const float quadVertices[] = {
+        // position   // tex coords
+        -1.0f, -1.0f,  0.0f, 0.0f,
+         1.0f, -1.0f,  1.0f, 0.0f,
+         1.0f,  1.0f,  1.0f, 1.0f,
+
+        -1.0f, -1.0f,  0.0f, 0.0f,
+         1.0f,  1.0f,  1.0f, 1.0f,
+        -1.0f,  1.0f,  0.0f, 1.0f
+    };
+
+    glGenVertexArrays(1, &screenVAO);
+    glGenBuffers(1, &screenVBO);
+
+    glBindVertexArray(screenVAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, screenVBO);
+    glBufferData(
+        GL_ARRAY_BUFFER,
+        sizeof(quadVertices),
+        quadVertices,
+        GL_STATIC_DRAW
+    );
+
+    glVertexAttribPointer(
+        0,
+        2,
+        GL_FLOAT,
+        GL_FALSE,
+        4 * sizeof(float),
+        reinterpret_cast<void*>(0)
+    );
+    glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(
+        1,
+        2,
+        GL_FLOAT,
+        GL_FALSE,
+        4 * sizeof(float),
+        reinterpret_cast<void*>(2 * sizeof(float))
+    );
+    glEnableVertexAttribArray(1);
+
+    glBindVertexArray(0);
+}
+
 bool Application::initialize() {
     if (!glfwInit()) {
         std::cerr << "Failed to initialize GLFW\n";
@@ -163,8 +214,14 @@ bool Application::initialize() {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    edgeShader = Shader(
+        GAME_SHADER_DIR "/edge.vert",
+        GAME_SHADER_DIR "/edge.frag"
+    );
     
     initializeFramebuffer();
+    initializeScreenQuad();
 
     instance = this;
     glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
@@ -201,17 +258,43 @@ void Application::run() {
 
         scene.render(view, projection, camera.getPosition());
 
-        glBindFramebuffer(GL_READ_FRAMEBUFFER, sceneFramebuffer);
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-        glBlitFramebuffer(
-            0, 0, width, height,
-            0, 0, width, height,
-            GL_COLOR_BUFFER_BIT,
-            GL_NEAREST
+        glDisable(GL_DEPTH_TEST);
+        glDisable(GL_BLEND);
+
+        edgeShader.use();
+
+        edgeShader.setInt("uColor", 0);
+        edgeShader.setInt("uNormal", 1);
+        edgeShader.setInt("uDepth", 2);
+
+        edgeShader.setVec2(
+            "uTexelSize",
+            glm::vec2(
+                1.0f / static_cast<float>(width),
+                1.0f / static_cast<float>(height)
+            )
         );
 
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        // Color
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, colorTexture);
+
+        // Normals
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, normalTexture);
+
+        // Depth
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, depthTexture);
+
+        glBindVertexArray(screenVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glBindVertexArray(0);
+
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_BLEND);
 
         glfwSwapBuffers(window);
         glfwPollEvents();

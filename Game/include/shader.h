@@ -49,6 +49,14 @@ public:
         glUniformMatrix4fv(glGetUniformLocation(ID, name), 1, GL_FALSE, glm::value_ptr(matrix));
     }
 
+    void setVec2(const char* name, const glm::vec2& value) const {
+        glUniform2f(
+            glGetUniformLocation(ID, name),
+            value.x,
+            value.y
+        );
+    }
+
 private:
     static std::string readTextFile(const char* path) {
         std::ifstream file(path);

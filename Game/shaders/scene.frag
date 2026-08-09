@@ -1,5 +1,6 @@
 #version 330 core
-out vec4 FragColor;
+layout(location = 0) out vec4 FragColor;
+layout(location = 1) out vec4 FragNormal;
 
 in vec3 vFragPos;
 in vec3 vNormal;
@@ -26,10 +27,17 @@ uniform float uLanternRange;
 uniform int uUnlit;
 uniform float uOpacity;
 
+float toonStep(float value)
+{
+    if (value > 0.6) return 1.0;
+    if (value > 0.25) return 0.5;
+    return 0.0;
+}
 void main()
 {
     if (uUnlit == 1) {
         FragColor = vec4(uObjectColor, uOpacity);
+        FragNormal = vec4(0.5, 0.5, 0.5, 1.0);
         return;
     }
 
@@ -42,6 +50,7 @@ void main()
     vec3 objectColor = mix(uObjectColor, texColor, 0.9);  // 90% texture, 10% object color
     
     vec3 normal = normalize(vNormal);
+    FragNormal = vec4(normal * 0.5 + 0.5, 1.0);
     vec3 viewDir = normalize(uViewPos - vFragPos);
     vec3 lanternLightDir = normalize(uLight.position - vFragPos);
     vec3 lanternReflectDir = reflect(-lanternLightDir, normal);
@@ -51,7 +60,7 @@ void main()
     float ambientStrength = 0.35;
     vec3 ambient = ambientStrength * objectColor;
 
-    float lanternDiff = max(dot(normal, lanternLightDir), 0.0);
+    float lanternDiff = toonStep(max(dot(normal, lanternLightDir), 0.0));
     float lanternDistance = length(uLight.position - vFragPos);
     float lanternFalloff = 1.0 - smoothstep(uLanternRange * 0.4, uLanternRange, lanternDistance);
     vec3 lanternDiffuse = lanternDiff * objectColor * uLight.color * uLight.intensity * lanternFalloff;
@@ -60,7 +69,7 @@ void main()
     float lanternSpec = pow(max(dot(viewDir, lanternReflectDir), 0.0), 16.0);
     vec3 lanternSpecular = specStrength * lanternSpec * uLight.color * uLight.intensity * lanternFalloff;
 
-    float moonDiff = max(dot(normal, moonLightDir), 0.0);
+    float moonDiff = toonStep(max(dot(normal, moonLightDir), 0.0));
     vec3 moonDiffuse = moonDiff * objectColor * uMoon.color * uMoon.intensity;
 
     float moonSpec = pow(max(dot(viewDir, moonReflectDir), 0.0), 8.0);

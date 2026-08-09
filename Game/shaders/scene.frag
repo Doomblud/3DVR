@@ -33,7 +33,12 @@ void main()
         return;
     }
 
-    vec3 texColor = texture(uTexture, vTexCoord).rgb;
+    vec4 texSample = texture(uTexture, vTexCoord);
+    if (texSample.a < 0.1) {
+        discard;
+    }
+
+    vec3 texColor = texSample.rgb;
     vec3 objectColor = mix(uObjectColor, texColor, 0.9);  // 90% texture, 10% object color
     
     vec3 normal = normalize(vNormal);

@@ -33,6 +33,12 @@ float toonStep(float value)
     if (value > 0.25) return 0.5;
     return 0.0;
 }
+
+float toonSpecular(float value)
+{
+    return value > 0.5 ? 1.0 : 0.0;
+}
+
 void main()
 {
     if (uUnlit == 1) {
@@ -66,13 +72,13 @@ void main()
     vec3 lanternDiffuse = lanternDiff * objectColor * uLight.color * uLight.intensity * lanternFalloff;
 
     float specStrength = 0.2;
-    float lanternSpec = pow(max(dot(viewDir, lanternReflectDir), 0.0), 16.0);
+    float lanternSpec = toonSpecular(pow(max(dot(viewDir, lanternReflectDir), 0.0), 16.0));
     vec3 lanternSpecular = specStrength * lanternSpec * uLight.color * uLight.intensity * lanternFalloff;
 
     float moonDiff = toonStep(max(dot(normal, moonLightDir), 0.0));
     vec3 moonDiffuse = moonDiff * objectColor * uMoon.color * uMoon.intensity;
 
-    float moonSpec = pow(max(dot(viewDir, moonReflectDir), 0.0), 8.0);
+    float moonSpec = toonSpecular(pow(max(dot(viewDir, moonReflectDir), 0.0), 8.0));
     vec3 moonSpecular = 0.12 * moonSpec * uMoon.color * uMoon.intensity;
 
     vec3 color = ambient + moonDiffuse + moonSpecular + lanternDiffuse + lanternSpecular;

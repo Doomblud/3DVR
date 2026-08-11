@@ -23,9 +23,9 @@
         - Pond in the scene reflecting/refracting the cubemap
 
 - Intermediate features:
-    - frame buffer object effects
+    - frame buffer object effects ✔
 - advanced feature:
-    - Toon Shading ==> edge detection and outline rendering
+    - Toon Shading ==> edge detection and outline rendering ✔
 
 
 - The setups are located in the **Game** folder 

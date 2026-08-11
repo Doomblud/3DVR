@@ -16,7 +16,7 @@
     - Game logic 
         - Clicking lantern turns it on/off ✔
     - Object moving in the scene ✔
-        - Person walking around
+        - Ghost walking around
     - free navigation within it (camera control) ✔
         - standard
     - Reflection/refraction ✔

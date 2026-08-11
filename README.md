@@ -28,4 +28,5 @@
     - Toon Shading ==> edge detection and outline rendering ✔
 
 
-- The setups are located in the **Game** folder 
+- The setups are located in the [**Game**](Game) folder
+- Instructions to build and run the project are located [here](Game/README.md)

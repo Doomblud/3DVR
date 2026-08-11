@@ -4,11 +4,12 @@
 
 - Standalone CMake target using GLFW + GLAD + OpenGL + GLM.
 - Free camera navigation.
-- Scene renderer with placeholder shrine yard layout.
+- Scene renderer with shrine yard layout.
 - Basic ambient + diffuse + specular lighting.
 - Procedural cubemap skybox.
 - Reflective/refractive pond water.
 - Lantern toggle interaction placeholder.
+- frame-buffer and toon shading
 
 ## Controls
 
@@ -29,12 +30,4 @@ cd build/game/Release
 .\ShrineScene.exe
 ```
 
-## Asset folders
-
-- `assets/models`
-- `assets/textures`
-- `assets/cubemaps`
-
-These are ready for model and texture import in the next step.
-
-* CMake uses 3rdParty dependencies from the exercise folder; put info-h502 in the root folder before building. And make sure glad, glfw, glm, and stb are not empty, otherwise you can clone them as stated in the exercises on GitLab.
+* CMake uses 3rdParty dependencies from the exercise folder; put 3rdParty in the root folder before building. And make sure glad, glfw, glm, and stb are not empty.
